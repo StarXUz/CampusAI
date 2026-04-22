@@ -1,6 +1,10 @@
 .idea/
+.vscode/
+*.iml
 **/target/
 *.log
+.env
+.env.*
 .DS_Store
 tmp/
 runtime-smoke/
@@ -8,4 +12,3 @@ runtime-db-backup/
 generated-static/
 outputs/
 runtime-uploads/
-
