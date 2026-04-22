@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.UserMapper">
+
+    <resultMap id="userMap" type="com.campusai.service.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="phone" column="phone"/>
+        <result property="password" column="password"/>
+        <result property="enabled" column="enabled"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="userMap">
+        select id, username, phone, password, enabled, avatar_url, created_at
+        from campus_user
+        where username = #{username}
+        limit 1
+    </select>
+
+    <select id="findById" resultMap="userMap">
+        select id, username, phone, password, enabled, avatar_url, created_at
+        from campus_user
+        where id = #{id}
+        limit 1
+    </select>
+
+    <select id="findByPhone" resultMap="userMap">
+        select id, username, phone, password, enabled, avatar_url, created_at
+        from campus_user
+        where phone = #{phone}
+        limit 1
+    </select>
+
+    <select id="findRolesByUserId" resultType="com.campusai.service.entity.Role">
+        select r.id, r.code, r.name
+        from campus_role r
+        inner join campus_user_role ur on ur.role_id = r.id
+        where ur.user_id = #{userId}
+    </select>
+
+    <select id="findRoleByCode" resultType="com.campusai.service.entity.Role">
+        select id, code, name
+        from campus_role
+        where code = #{code}
+        limit 1
+    </select>
+
+    <select id="findUsersByRoleCode" resultMap="userMap">
+        select distinct u.id, u.username, u.phone, u.password, u.enabled, u.avatar_url, u.created_at
+        from campus_user u
+        inner join campus_user_role ur on ur.user_id = u.id
+        inner join campus_role r on r.id = ur.role_id
+        where r.code = #{roleCode}
+        <if test="keyword != null and keyword != ''">
+            and (u.username like concat('%', #{keyword}, '%') or u.phone like concat('%', #{keyword}, '%'))
+        </if>
+        order by u.id desc
+    </select>
+
+    <select id="findUsersByRoleCodes" resultMap="userMap">
+        select distinct u.id, u.username, u.phone, u.password, u.enabled, u.avatar_url, u.created_at
+        from campus_user u
+        inner join campus_user_role ur on ur.user_id = u.id
+        inner join campus_role r on r.id = ur.role_id
+        where r.code in
+        <foreach collection="roleCodes" item="roleCode" open="(" separator="," close=")">
+            #{roleCode}
+        </foreach>
+        <if test="keyword != null and keyword != ''">
+            and (u.username like concat('%', #{keyword}, '%') or u.phone like concat('%', #{keyword}, '%'))
+        </if>
+        order by u.id desc
+    </select>
+
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_user (username, phone, password, enabled, avatar_url, created_at)
+        values (#{username}, #{phone}, #{password}, #{enabled}, #{avatarUrl}, now())
+    </insert>
+
+    <update id="updateUser">
+        update campus_user
+        set username = #{username},
+            phone = #{phone},
+            password = #{password},
+            enabled = #{enabled},
+            avatar_url = #{avatarUrl}
+        where id = #{id}
+    </update>
+
+    <insert id="insertUserRole">
+        insert into campus_user_role (user_id, role_id)
+        values (#{userId}, #{roleId})
+    </insert>
+
+    <delete id="deleteUserRoles">
+        delete from campus_user_role
+        where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUser">
+        delete from campus_user
+        where id = #{userId}
+    </delete>
+</mapper>

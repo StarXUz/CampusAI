@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.ActivityMapper">
+
+    <select id="findAll" resultType="com.campusai.service.entity.Activity">
+        select id, title, summary, location, poster_url, start_time, end_time, max_participants, status
+        from campus_activity
+        order by start_time desc
+    </select>
+
+    <select id="findById" resultType="com.campusai.service.entity.Activity">
+        select id, title, summary, location, poster_url, start_time, end_time, max_participants, status
+        from campus_activity
+        where id = #{id}
+    </select>
+
+    <insert id="insertActivity" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_activity (title, summary, location, poster_url, start_time, end_time, max_participants, status)
+        values (#{title}, #{summary}, #{location}, #{posterUrl}, #{startTime}, #{endTime}, #{maxParticipants}, #{status})
+    </insert>
+
+    <update id="updateActivity">
+        update campus_activity
+        set title = #{title},
+            summary = #{summary},
+            location = #{location},
+            poster_url = #{posterUrl},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            max_participants = #{maxParticipants},
+            status = #{status}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteActivity">
+        delete from campus_activity
+        where id = #{id}
+    </delete>
+
+    <select id="countRegistrations" resultType="int">
+        select count(1)
+        from campus_activity_registration
+        where activity_id = #{activityId}
+          and status = 'REGISTERED'
+    </select>
+
+    <select id="findRegistrationsByActivity" resultType="com.campusai.service.entity.ActivityRegistration">
+        select id, activity_id, user_id, real_name, student_no, phone, status, registered_at
+        from campus_activity_registration
+        where activity_id = #{activityId}
+        order by registered_at desc
+    </select>
+
+    <select id="findRegistration" resultType="com.campusai.service.entity.ActivityRegistration">
+        select id, activity_id, user_id, real_name, student_no, phone, status, registered_at
+        from campus_activity_registration
+        where activity_id = #{activityId} and user_id = #{userId}
+        limit 1
+    </select>
+
+    <select id="findRegistrationsByUser" resultType="com.campusai.service.entity.ActivityRegistration">
+        select id, activity_id, user_id, real_name, student_no, phone, status, registered_at
+        from campus_activity_registration
+        where user_id = #{userId}
+        order by registered_at desc
+    </select>
+
+    <insert id="insertRegistration" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_activity_registration (
+            activity_id, user_id, real_name, student_no, phone, status, registered_at
+        )
+        values (
+            #{activityId}, #{userId}, #{realName}, #{studentNo}, #{phone}, #{status}, #{registeredAt}
+        )
+    </insert>
+
+    <update id="updateRegistration">
+        update campus_activity_registration
+        set real_name = #{realName},
+            student_no = #{studentNo},
+            phone = #{phone},
+            status = #{status}
+        where id = #{id}
+    </update>
+
+    <update id="cancelRegistration">
+        update campus_activity_registration
+        set status = 'CANCELLED'
+        where activity_id = #{activityId} and user_id = #{userId}
+    </update>
+</mapper>

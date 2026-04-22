@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.StudyRoomMapper">
+
+    <select id="findAllRooms" resultType="com.campusai.service.entity.StudyRoom">
+        select id, name, location, open_time, close_time, max_hours, daily_limit
+        from campus_study_room
+        order by id asc
+    </select>
+
+    <select id="findRoomById" resultType="com.campusai.service.entity.StudyRoom">
+        select id, name, location, open_time, close_time, max_hours, daily_limit
+        from campus_study_room
+        where id = #{roomId}
+        limit 1
+    </select>
+
+    <insert id="insertRoom" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_study_room (name, location, open_time, close_time, max_hours, daily_limit)
+        values (#{name}, #{location}, #{openTime}, #{closeTime}, #{maxHours}, #{dailyLimit})
+    </insert>
+
+    <update id="updateRoom">
+        update campus_study_room
+        set name = #{name},
+            location = #{location},
+            open_time = #{openTime},
+            close_time = #{closeTime},
+            max_hours = #{maxHours},
+            daily_limit = #{dailyLimit}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRoom">
+        delete from campus_study_room
+        where id = #{roomId}
+    </delete>
+
+    <select id="findSeatsByRoomId" resultType="com.campusai.service.entity.Seat">
+        select id, study_room_id, seat_code, floor_no, zone_name, status
+        from campus_seat
+        where study_room_id = #{roomId}
+        order by floor_no, seat_code
+    </select>
+
+    <select id="findRuleByRoomId" resultType="com.campusai.service.entity.ReservationRule">
+        select id, study_room_id, max_hours, daily_limit, cancel_before_minutes, enabled
+        from campus_reservation_rule
+        where study_room_id = #{roomId}
+        limit 1
+    </select>
+
+    <insert id="insertRule" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_reservation_rule (study_room_id, max_hours, daily_limit, cancel_before_minutes, enabled)
+        values (#{studyRoomId}, #{maxHours}, #{dailyLimit}, #{cancelBeforeMinutes}, #{enabled})
+    </insert>
+
+    <update id="updateRule">
+        update campus_reservation_rule
+        set max_hours = #{maxHours},
+            daily_limit = #{dailyLimit},
+            cancel_before_minutes = #{cancelBeforeMinutes},
+            enabled = #{enabled}
+        where id = #{id}
+    </update>
+
+    <select id="countReservationsByRoomId" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where study_room_id = #{roomId}
+    </select>
+
+    <delete id="deleteSeatsByRoomId">
+        delete from campus_seat
+        where study_room_id = #{roomId}
+    </delete>
+
+    <delete id="deleteRuleByRoomId">
+        delete from campus_reservation_rule
+        where study_room_id = #{roomId}
+    </delete>
+
+    <select id="countRescheduleColumn" resultType="int">
+        select count(1)
+        from information_schema.columns
+        where table_schema = database()
+          and table_name = 'campus_reservation_record'
+          and column_name = 'reschedule_count'
+    </select>
+
+    <update id="addRescheduleColumn">
+        alter table campus_reservation_record
+            add column reschedule_count int not null default 0
+    </update>
+
+    <select id="countUserReservationsByDate" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where user_id = #{userId}
+          and reservation_date = #{reservationDate}
+          and status = 'BOOKED'
+    </select>
+
+    <select id="countSeatConflicts" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where seat_id = #{seatId}
+          and reservation_date = #{reservationDate}
+          and status = 'BOOKED'
+          and #{startTime} &lt; end_time
+          and #{endTime} &gt; start_time
+    </select>
+
+    <select id="countSeatConflictsExclude" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where seat_id = #{seatId}
+          and reservation_date = #{reservationDate}
+          and status = 'BOOKED'
+          and id != #{excludeReservationId}
+          and #{startTime} &lt; end_time
+          and #{endTime} &gt; start_time
+    </select>
+
+    <select id="countUserReservationConflicts" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where user_id = #{userId}
+          and reservation_date = #{reservationDate}
+          and status = 'BOOKED'
+          and #{startTime} &lt; end_time
+          and #{endTime} &gt; start_time
+    </select>
+
+    <select id="countUserReservationConflictsExclude" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where user_id = #{userId}
+          and reservation_date = #{reservationDate}
+          and status = 'BOOKED'
+          and id != #{excludeReservationId}
+          and #{startTime} &lt; end_time
+          and #{endTime} &gt; start_time
+    </select>
+
+    <select id="countUserReservationsByDateExclude" resultType="int">
+        select count(1)
+        from campus_reservation_record
+        where user_id = #{userId}
+          and reservation_date = #{reservationDate}
+          and status = 'BOOKED'
+          and id != #{excludeReservationId}
+    </select>
+
+    <select id="countSeatInRoom" resultType="int">
+        select count(1)
+        from campus_seat
+        where study_room_id = #{roomId}
+          and id = #{seatId}
+    </select>
+
+    <select id="lockSeatByIdForUpdate" resultType="com.campusai.service.entity.Seat">
+        select id, study_room_id, seat_code, floor_no, zone_name, status
+        from campus_seat
+        where id = #{seatId}
+        for update
+    </select>
+
+    <select id="findReservationsByUser" resultType="com.campusai.service.entity.ReservationRecord">
+        select r.id,
+               r.user_id,
+               r.study_room_id,
+               r.seat_id,
+               r.reservation_date,
+               r.start_time,
+               r.end_time,
+               r.status,
+               r.voucher_code,
+               r.created_at,
+               r.reschedule_count,
+               sr.name as study_room_name,
+               s.seat_code
+        from campus_reservation_record r
+                 left join campus_study_room sr on sr.id = r.study_room_id
+                 left join campus_seat s on s.id = r.seat_id
+        where r.user_id = #{userId}
+        order by r.reservation_date desc, r.start_time desc, r.id desc
+    </select>
+
+    <select id="findReservationsByRoomAndRange" resultType="com.campusai.service.entity.ReservationRecord">
+        select r.id,
+               r.user_id,
+               r.study_room_id,
+               r.seat_id,
+               r.reservation_date,
+               r.start_time,
+               r.end_time,
+               r.status,
+               r.voucher_code,
+               r.created_at,
+               r.reschedule_count,
+               sr.name as study_room_name,
+               s.seat_code
+        from campus_reservation_record r
+                 left join campus_study_room sr on sr.id = r.study_room_id
+                 left join campus_seat s on s.id = r.seat_id
+        where r.study_room_id = #{roomId}
+          and r.reservation_date >= #{startDate}
+          and r.reservation_date &lt;= #{endDate}
+        order by r.reservation_date asc, r.start_time asc, r.id asc
+    </select>
+
+    <select id="findReservationById" resultType="com.campusai.service.entity.ReservationRecord">
+        select id,
+               user_id,
+               study_room_id,
+               seat_id,
+               reservation_date,
+               start_time,
+               end_time,
+               status,
+               voucher_code,
+               created_at,
+               reschedule_count
+        from campus_reservation_record
+        where id = #{id}
+        limit 1
+    </select>
+
+    <select id="findReservationByIdAndUser" resultType="com.campusai.service.entity.ReservationRecord">
+        select id,
+               user_id,
+               study_room_id,
+               seat_id,
+               reservation_date,
+               start_time,
+               end_time,
+               status,
+               voucher_code,
+               created_at,
+               reschedule_count
+        from campus_reservation_record
+        where id = #{id}
+          and user_id = #{userId}
+        limit 1
+    </select>
+
+    <select id="lockReservationByIdAndUserForUpdate" resultType="com.campusai.service.entity.ReservationRecord">
+        select id,
+               user_id,
+               study_room_id,
+               seat_id,
+               reservation_date,
+               start_time,
+               end_time,
+               status,
+               voucher_code,
+               created_at,
+               reschedule_count
+        from campus_reservation_record
+        where id = #{id}
+          and user_id = #{userId}
+        for update
+    </select>
+
+    <insert id="insertReservation" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_reservation_record (
+            user_id, study_room_id, seat_id, reservation_date, start_time, end_time, status, voucher_code, created_at, reschedule_count
+        )
+        values (
+            #{userId}, #{studyRoomId}, #{seatId}, #{reservationDate}, #{startTime}, #{endTime}, #{status}, #{voucherCode}, #{createdAt}, #{rescheduleCount}
+        )
+    </insert>
+
+    <update id="updateReservation">
+        update campus_reservation_record
+        set study_room_id = #{studyRoomId},
+            seat_id = #{seatId},
+            reservation_date = #{reservationDate},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            status = #{status},
+            voucher_code = #{voucherCode},
+            reschedule_count = #{rescheduleCount}
+        where id = #{id}
+    </update>
+
+    <update id="cancelReservation">
+        update campus_reservation_record
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <insert id="insertSeatBatch">
+        insert into campus_seat (study_room_id, seat_code, floor_no, zone_name, status)
+        values
+        <foreach collection="seats" item="seat" separator=",">
+            (#{seat.studyRoomId}, #{seat.seatCode}, #{seat.floorNo}, #{seat.zoneName}, #{seat.status})
+        </foreach>
+    </insert>
+</mapper>

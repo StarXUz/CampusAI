@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.SuperAuditLogMapper">
+
+    <update id="ensureTable">
+        CREATE TABLE IF NOT EXISTS campus_super_audit_log
+        (
+            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            operation_type VARCHAR(64) NOT NULL,
+            target_user_id BIGINT NULL,
+            target_username VARCHAR(128) NULL,
+            role_code VARCHAR(64) NULL,
+            action_result VARCHAR(32) NOT NULL,
+            detail VARCHAR(512) NULL,
+            operator_name VARCHAR(128) NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    </update>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_super_audit_log (
+            operation_type, target_user_id, target_username, role_code, action_result, detail, operator_name, created_at
+        )
+        values (
+            #{operationType}, #{targetUserId}, #{targetUsername}, #{roleCode}, #{actionResult}, #{detail}, #{operatorName}, now()
+        )
+    </insert>
+
+    <select id="listLatest" resultType="com.campusai.service.entity.SuperAuditLog">
+        select id,
+               operation_type,
+               target_user_id,
+               target_username,
+               role_code,
+               action_result,
+               detail,
+               operator_name,
+               created_at
+        from campus_super_audit_log
+        order by id desc
+        limit #{limit}
+    </select>
+
+    <select id="listByFilter" resultType="com.campusai.service.entity.SuperAuditLog">
+        select id,
+               operation_type,
+               target_user_id,
+               target_username,
+               role_code,
+               action_result,
+               detail,
+               operator_name,
+               created_at
+        from campus_super_audit_log
+        <where>
+            <if test="operationType != null and operationType != ''">
+                and operation_type = #{operationType}
+            </if>
+            <if test="operatorName != null and operatorName != ''">
+                and operator_name like concat('%', #{operatorName}, '%')
+            </if>
+            <if test="actionResult != null and actionResult != ''">
+                and action_result = #{actionResult}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and created_at &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and created_at &lt;= #{endTime}
+            </if>
+        </where>
+        order by id desc
+        limit #{limit}
+    </select>
+
+    <select id="pageByFilter" resultType="com.campusai.service.entity.SuperAuditLog">
+        select id,
+               operation_type,
+               target_user_id,
+               target_username,
+               role_code,
+               action_result,
+               detail,
+               operator_name,
+               created_at
+        from campus_super_audit_log
+        <where>
+            <if test="operationType != null and operationType != ''">
+                and operation_type = #{operationType}
+            </if>
+            <if test="operatorName != null and operatorName != ''">
+                and operator_name like concat('%', #{operatorName}, '%')
+            </if>
+            <if test="actionResult != null and actionResult != ''">
+                and action_result = #{actionResult}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and created_at &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and created_at &lt;= #{endTime}
+            </if>
+        </where>
+        order by id desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="countByFilter" resultType="long">
+        select count(1)
+        from campus_super_audit_log
+        <where>
+            <if test="operationType != null and operationType != ''">
+                and operation_type = #{operationType}
+            </if>
+            <if test="operatorName != null and operatorName != ''">
+                and operator_name like concat('%', #{operatorName}, '%')
+            </if>
+            <if test="actionResult != null and actionResult != ''">
+                and action_result = #{actionResult}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and created_at &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and created_at &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryDailyStats" resultType="map">
+        select date(created_at) as day,
+               sum(case when operation_type = 'CREATE_USER' then 1 else 0 end) as createCount,
+               sum(case when operation_type = 'UPDATE_USER' then 1 else 0 end) as updateCount,
+               sum(case when operation_type = 'DELETE_USER' then 1 else 0 end) as deleteCount,
+               sum(case when operation_type = 'IMPORT_USER' then 1 else 0 end) as importCount,
+               count(1) as totalCount
+        from campus_super_audit_log
+        where date(created_at) &gt;= #{startDate}
+        group by date(created_at)
+        order by day asc
+    </select>
+</mapper>

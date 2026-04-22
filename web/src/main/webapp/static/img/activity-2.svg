@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="活动海报">
+  <defs>
+    <linearGradient id="act2" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#4f2d1d"/>
+      <stop offset="100%" stop-color="#d88835"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="480" rx="36" fill="url(#act2)"/>
+  <path d="M560 72h124c22 0 40 18 40 40v124c0 22-18 40-40 40H560z" fill="#ffffff14"/>
+  <path d="M608 288h136c18 0 32 14 32 32v88c0 18-14 32-32 32H608z" fill="#ffffff10"/>
+  <text x="72" y="168" font-size="60" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#fff6ec">校园文体活动</text>
+  <text x="72" y="242" font-size="30" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#fff0dd">音乐 · 夜跑 · 电影夜 · 社团联动</text>
+  <rect x="72" y="292" width="246" height="62" rx="31" fill="#fff6ec"/>
+  <text x="195" y="334" text-anchor="middle" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#7d4419">精彩进行中</text>
+</svg>

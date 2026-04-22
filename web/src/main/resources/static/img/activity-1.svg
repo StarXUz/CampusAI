@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="活动海报">
+  <defs>
+    <linearGradient id="act1" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1b3358"/>
+      <stop offset="100%" stop-color="#4a79c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="480" rx="36" fill="url(#act1)"/>
+  <circle cx="640" cy="130" r="92" fill="#ffffff14"/>
+  <circle cx="560" cy="360" r="120" fill="#ffffff0f"/>
+  <text x="72" y="168" font-size="60" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#ffffff">校园创新活动</text>
+  <text x="72" y="242" font-size="30" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#dbe7fb">讲座 · 分享 · 创客展 · 沙龙</text>
+  <rect x="72" y="292" width="228" height="62" rx="31" fill="#ffffff"/>
+  <text x="186" y="334" text-anchor="middle" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#21406f">CampusAI</text>
+</svg>

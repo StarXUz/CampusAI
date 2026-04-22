@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.MerchantMapper">
+
+    <resultMap id="merchantMap" type="com.campusai.service.entity.Merchant">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="canteenName" column="canteen_name"/>
+        <result property="logoUrl" column="logo_url"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="auditStatus" column="audit_status"/>
+        <result property="recommended" column="recommended"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="merchantMap">
+        select id, name, canteen_name, logo_url, contact_phone, audit_status, recommended
+        from campus_merchant
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%', #{keyword}, '%') or canteen_name like concat('%', #{keyword}, '%'))
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="findAllInIds" resultMap="merchantMap">
+        select id, name, canteen_name, logo_url, contact_phone, audit_status, recommended
+        from campus_merchant
+        <where>
+            id in
+            <foreach collection="merchantIds" item="merchantId" open="(" separator="," close=")">
+                #{merchantId}
+            </foreach>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%', #{keyword}, '%') or canteen_name like concat('%', #{keyword}, '%'))
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="findApproved" resultMap="merchantMap">
+        select id, name, canteen_name, logo_url, contact_phone, audit_status, recommended
+        from campus_merchant
+        where audit_status = 'APPROVED'
+        order by recommended desc, id desc
+    </select>
+
+    <select id="findById" resultMap="merchantMap">
+        select id, name, canteen_name, logo_url, contact_phone, audit_status, recommended
+        from campus_merchant
+        where id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_merchant (name, canteen_name, logo_url, contact_phone, audit_status, recommended)
+        values (#{name}, #{canteenName}, #{logoUrl}, #{contactPhone}, #{auditStatus}, #{recommended})
+    </insert>
+
+    <update id="update">
+        update campus_merchant
+        set name = #{name},
+            canteen_name = #{canteenName},
+            logo_url = #{logoUrl},
+            contact_phone = #{contactPhone},
+            audit_status = #{auditStatus},
+            recommended = #{recommended}
+        where id = #{id}
+    </update>
+
+    <update id="updateAuditStatus">
+        update campus_merchant
+        set audit_status = #{auditStatus}
+        where id = #{id}
+    </update>
+</mapper>

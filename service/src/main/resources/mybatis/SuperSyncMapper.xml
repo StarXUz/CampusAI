@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.SuperSyncMapper">
+
+    <select id="querySharedSummary" resultType="map">
+        select
+            (select count(1) from campus_merchant) as merchantCount,
+            (select count(1) from campus_dish) as dishCount,
+            (select count(1) from campus_package) as packageCount,
+            (select count(1) from campus_activity) as activityCount,
+            (select count(1) from campus_study_room) as studyRoomCount,
+            (select count(1) from campus_order where status = 'PAID') as paidOrderCount,
+            (select count(1) from campus_order where date(created_at) = curdate()) as todayOrderCount,
+            (select count(1) from campus_reservation_record where status = 'BOOKED' and reservation_date = curdate()) as todayReservationCount
+    </select>
+
+    <select id="queryLatestMerchants" resultType="map">
+        select id, name, canteen_name as canteenName, audit_status as auditStatus, recommended, logo_url as logoUrl
+        from campus_merchant
+        order by id desc
+        limit 5
+    </select>
+
+    <select id="queryLatestActivities" resultType="map">
+        select id, title, location, status, start_time as startTime
+        from campus_activity
+        order by id desc
+        limit 5
+    </select>
+
+    <select id="queryLatestOrders" resultType="map">
+        select o.id,
+               o.item_name as itemName,
+               o.total_amount as totalAmount,
+               o.status,
+               o.pay_channel as payChannel,
+               o.created_at as createdAt,
+               m.name as merchantName
+        from campus_order o
+        left join campus_merchant m on m.id = o.merchant_id
+        order by o.id desc
+        limit 5
+    </select>
+
+    <select id="queryLatestReservations" resultType="map">
+        select r.id,
+               sr.name as studyRoomName,
+               s.seat_code as seatCode,
+               r.reservation_date as reservationDate,
+               r.start_time as startTime,
+               r.end_time as endTime,
+               r.status
+        from campus_reservation_record r
+        left join campus_study_room sr on sr.id = r.study_room_id
+        left join campus_seat s on s.id = r.seat_id
+        order by r.id desc
+        limit 5
+    </select>
+
+    <select id="queryUserBizUsage" resultType="map">
+        select
+            (select count(1) from campus_order where user_id = #{userId}) as orderCount,
+            (select count(1) from campus_reservation_record where user_id = #{userId}) as reservationCount,
+            (select count(1) from campus_activity_registration where user_id = #{userId}) as activitySignupCount
+    </select>
+</mapper>

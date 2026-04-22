@@ -1,0 +1,11 @@
+.idea/
+**/target/
+*.log
+.DS_Store
+tmp/
+runtime-smoke/
+runtime-db-backup/
+generated-static/
+outputs/
+runtime-uploads/
+

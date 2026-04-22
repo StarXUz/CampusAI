@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="用户头像">
+  <defs>
+    <linearGradient id="user-bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#235245"/>
+      <stop offset="100%" stop-color="#63b59b"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="48" fill="url(#user-bg)"/>
+  <circle cx="120" cy="92" r="42" fill="#f5fffb"/>
+  <path d="M56 204c12-34 39-52 64-52s52 18 64 52" fill="#f5fffb"/>
+  <text x="120" y="212" text-anchor="middle" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#dff7ef">USER</text>
+</svg>

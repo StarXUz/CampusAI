@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.DashboardMapper">
+
+    <sql id="merchantIdSet">
+        <foreach collection="merchantIds" item="merchantId" open="(" separator="," close=")">
+            #{merchantId}
+        </foreach>
+    </sql>
+
+    <select id="querySummary" resultType="map">
+        select
+            (select count(1) from campus_merchant) as merchantCount,
+            (select count(1) from campus_dish) as dishCount,
+            (select count(1) from campus_package) as packageCount,
+            (select count(1) from campus_study_room) as studyRoomCount,
+            (select count(1) from campus_activity) as activityCount
+    </select>
+
+    <select id="querySummaryByMerchantIds" resultType="map">
+        select
+            (select count(1) from campus_merchant where id in <include refid="merchantIdSet"/>) as merchantCount,
+            (select count(1) from campus_dish where merchant_id in <include refid="merchantIdSet"/>) as dishCount,
+            (select count(1) from campus_package where merchant_id in <include refid="merchantIdSet"/>) as packageCount,
+            (select count(1) from campus_study_room) as studyRoomCount,
+            (select count(1) from campus_activity) as activityCount
+    </select>
+
+    <select id="queryRegisterTrend" resultType="map">
+        select date_format(created_at, '%Y-%m-%d') as statDate, count(1) as statValue
+        from campus_user
+        where created_at >= date_sub(curdate(), interval 30 day)
+        group by date_format(created_at, '%Y-%m-%d')
+        order by statDate
+    </select>
+
+    <select id="queryOrderRatio" resultType="map">
+        select m.name as statName, count(o.id) as statValue
+        from campus_order o
+        inner join campus_merchant m on m.id = o.merchant_id
+        group by m.id, m.name
+        order by statValue desc
+    </select>
+
+    <select id="queryOrderRatioByMerchantIds" resultType="map">
+        select m.name as statName, count(o.id) as statValue
+        from campus_order o
+        inner join campus_merchant m on m.id = o.merchant_id
+        where o.merchant_id in <include refid="merchantIdSet"/>
+        group by m.id, m.name
+        order by statValue desc
+    </select>
+
+    <select id="queryStudyRoomUsage" resultType="map">
+        select concat(hour(start_time), ':00-', hour(end_time), ':00') as statName, count(1) as statValue
+        from campus_reservation_record
+        where status = 'BOOKED'
+        group by concat(hour(start_time), ':00-', hour(end_time), ':00')
+        order by statName
+    </select>
+
+    <select id="queryActivityHotRank" resultType="map">
+        select a.title as statName, count(r.id) as statValue
+        from campus_activity a
+        left join campus_activity_registration r on a.id = r.activity_id and r.status = 'REGISTERED'
+        group by a.id, a.title
+        order by statValue desc
+    </select>
+
+    <select id="queryMonthlyOperationReport" resultType="map">
+        select m.name as merchantName,
+               cast(coalesce(sum(case when o.status = 'PAID' then o.total_amount else 0 end), 0) as decimal(10, 2)) as revenue,
+               count(o.id) as orderCount,
+               concat(
+                   round(
+                       case when count(o.id) = 0 then 0
+                            else sum(case when o.status = 'CANCELLED' then 1 else 0 end) / count(o.id) * 100
+                       end
+                   , 1),
+                   '%'
+               ) as refundRate
+        from campus_merchant m
+                 left join campus_order o
+                           on o.merchant_id = m.id
+                               and o.created_at >= date_sub(curdate(), interval 30 day)
+        group by m.id, m.name
+        order by revenue desc, orderCount desc, m.id asc
+    </select>
+
+    <select id="queryMonthlyOperationReportByMerchantIds" resultType="map">
+        select m.name as merchantName,
+               cast(coalesce(sum(case when o.status = 'PAID' then o.total_amount else 0 end), 0) as decimal(10, 2)) as revenue,
+               count(o.id) as orderCount,
+               concat(
+                   round(
+                       case when count(o.id) = 0 then 0
+                            else sum(case when o.status = 'CANCELLED' then 1 else 0 end) / count(o.id) * 100
+                       end
+                   , 1),
+                   '%'
+               ) as refundRate
+        from campus_merchant m
+                 left join campus_order o
+                           on o.merchant_id = m.id
+                               and o.created_at >= date_sub(curdate(), interval 30 day)
+        where m.id in <include refid="merchantIdSet"/>
+        group by m.id, m.name
+        order by revenue desc, orderCount desc, m.id asc
+    </select>
+</mapper>

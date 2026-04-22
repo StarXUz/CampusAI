@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campusai.service.mapper.DishMapper">
+
+    <select id="findCategoriesByMerchant" resultType="com.campusai.service.entity.DishCategory">
+        select id, merchant_id, name, sort_order
+        from campus_dish_category
+        where merchant_id = #{merchantId}
+        order by sort_order asc, id asc
+    </select>
+
+    <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_dish_category (merchant_id, name, sort_order)
+        values (#{merchantId}, #{name}, #{sortOrder})
+    </insert>
+
+    <select id="findDishes" resultType="com.campusai.service.entity.Dish">
+        select id, merchant_id, category_id, name, description, price, image_url, on_sale, calories
+        from campus_dish
+        where merchant_id = #{merchantId}
+        <if test="categoryId != null">
+            and category_id = #{categoryId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%', #{keyword}, '%')
+            or description like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="onSale != null">
+            and on_sale = #{onSale}
+        </if>
+        <if test="onlyOnSale != null and onlyOnSale">
+            and on_sale = 1
+        </if>
+        <if test="(onlyOnSale == null or !onlyOnSale) and (includeSoldOut != null and !includeSoldOut)">
+            and on_sale = 1
+        </if>
+        order by id desc
+    </select>
+
+    <select id="findDishById" resultType="com.campusai.service.entity.Dish">
+        select id, merchant_id, category_id, name, description, price, image_url, on_sale, calories
+        from campus_dish
+        where id = #{id}
+    </select>
+
+    <insert id="insertDish" useGeneratedKeys="true" keyProperty="id">
+        insert into campus_dish (merchant_id, category_id, name, description, price, image_url, on_sale, calories)
+        values (#{merchantId}, #{categoryId}, #{name}, #{description}, #{price}, #{imageUrl}, #{onSale}, #{calories})
+    </insert>
+
+    <update id="updateDish">
+        update campus_dish
+        set merchant_id = #{merchantId},
+            category_id = #{categoryId},
+            name = #{name},
+            description = #{description},
+            price = #{price},
+            image_url = #{imageUrl},
+            on_sale = #{onSale},
+            calories = #{calories}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDish">
+        delete from campus_dish
+        where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nginx 静态化部署说明</title>
+    <style>
+        body { margin: 0; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f4f7fb; color: #25374a; }
+        .page { max-width: 980px; margin: 0 auto; padding: 40px 24px 56px; }
+        .hero { padding: 30px 32px; border-radius: 28px; background: linear-gradient(135deg, #23435f, #3f79ab); color: #fff; }
+        .hero h1 { margin: 0 0 10px; font-size: 34px; }
+        .hero p { margin: 0; line-height: 1.8; color: rgba(255,255,255,.88); }
+        .card { margin-top: 20px; background: #fff; border: 1px solid #dde7f1; border-radius: 24px; padding: 24px 26px; box-shadow: 0 18px 38px rgba(95,123,156,.08); }
+        h2 { margin: 0 0 12px; font-size: 22px; }
+        p, li { line-height: 1.85; color: #5d7083; }
+        code, pre { font-family: Menlo, Monaco, Consolas, monospace; }
+        pre { padding: 16px; border-radius: 16px; background: #0f1b29; color: #e8f1ff; overflow: auto; }
+        ul { margin: 0; padding-left: 18px; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <h1>Nginx 静态化部署说明</h1>
+        <p>本项目的活动详情页通过 FreeMarker 自动生成静态 HTML，适合交给 Nginx 直接发布，降低动态接口压力并满足课程静态化评分点。</p>
+    </section>
+
+    <section class="card">
+        <h2>静态页生成目录</h2>
+        <p>默认目录：<code>generated-static/activities</code></p>
+        <p>活动发布、报名变化、活动截止关闭后，后台会自动刷新对应的静态页文件。</p>
+    </section>
+
+    <section class="card">
+        <h2>推荐 Nginx 配置</h2>
+        <pre>server {
+    listen 8088;
+    server_name localhost;
+
+    location /activities-static/ {
+        alias /Users/xujunming/idea-java/网站架构项目大作业/Campus Service ManagerAI/generated-static/activities/;
+        index index.html;
+        autoindex on;
+        charset utf-8;
+    }
+}</pre>
+    </section>
+
+    <section class="card">
+        <h2>演示建议</h2>
+        <ul>
+            <li>先在后台创建或修改一场活动，保存后会自动生成静态页。</li>
+            <li>在学生端完成报名或取消报名，再回到静态目录查看对应 HTML 更新时间。</li>
+            <li>等待活动结束或手动调整时间，后台定时任务会自动关闭活动并刷新静态页。</li>
+        </ul>
+    </section>
+</div>
+</body>
+</html>

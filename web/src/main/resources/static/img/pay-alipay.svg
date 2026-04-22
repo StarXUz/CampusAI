@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="支付宝支付">
+  <defs>
+    <linearGradient id="alipay-bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1395ff"/>
+      <stop offset="100%" stop-color="#49c0ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="42" fill="url(#alipay-bg)"/>
+  <rect x="54" y="54" width="132" height="132" rx="28" fill="#ffffff" opacity="0.95"/>
+  <path d="M94 96h56m-46 28h40m-58 28c16-4 31-10 46-18 13 8 26 14 40 18" fill="none" stroke="#1395ff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="120" y="206" text-anchor="middle" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#eaf7ff">支付宝</text>
+</svg>

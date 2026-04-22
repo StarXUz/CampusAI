@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="微信支付">
+  <defs>
+    <linearGradient id="wechat-bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1c9c5a"/>
+      <stop offset="100%" stop-color="#45d483"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="42" fill="url(#wechat-bg)"/>
+  <ellipse cx="102" cy="108" rx="54" ry="40" fill="#ffffff"/>
+  <ellipse cx="148" cy="134" rx="44" ry="34" fill="#f6fff8"/>
+  <circle cx="84" cy="102" r="6" fill="#1c9c5a"/>
+  <circle cx="118" cy="102" r="6" fill="#1c9c5a"/>
+  <circle cx="132" cy="128" r="5" fill="#1c9c5a"/>
+  <circle cx="158" cy="128" r="5" fill="#1c9c5a"/>
+  <text x="120" y="206" text-anchor="middle" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#eafff2">微信支付</text>
+</svg>

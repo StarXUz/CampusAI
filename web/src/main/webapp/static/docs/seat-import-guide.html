@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>座位导入说明</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg: #eef4fb;
+            --surface: rgba(255, 255, 255, 0.96);
+            --text: #203246;
+            --soft: #66788a;
+            --line: #dce7f3;
+            --primary: #3a86ff;
+            --radius: 18px;
+            --shadow: 0 18px 40px rgba(30, 58, 90, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(58, 134, 255, 0.18), transparent 28%),
+                linear-gradient(180deg, #eef4fb 0%, #f8fbff 100%);
+        }
+
+        .page {
+            width: min(980px, calc(100vw - 32px));
+            margin: 28px auto;
+            display: grid;
+            gap: 18px;
+        }
+
+        .hero,
+        .panel {
+            padding: 22px 24px;
+            border-radius: var(--radius);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+        }
+
+        .hero h1,
+        .panel h2 {
+            margin: 0 0 10px;
+        }
+
+        .hero p,
+        .panel p,
+        .panel li,
+        .panel ol {
+            color: var(--soft);
+            line-height: 1.8;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #edf2f8;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f4f8fe;
+        }
+
+        .tag {
+            display: inline-flex;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(58, 134, 255, 0.1);
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        code {
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: #f4f8fe;
+            font-family: "SFMono-Regular", Consolas, monospace;
+        }
+
+        @media (max-width: 860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <span class="tag">Seat Import Guide</span>
+        <h1>座位导入说明</h1>
+        <p>用于后台管理端批量导入图书馆 / 自习室座位。建议先创建自习室，再下载 Excel 模板填写数据，最后回到“自习室管理”页面执行导入。</p>
+    </section>
+
+    <section class="panel">
+        <h2>导入步骤</h2>
+        <ol>
+            <li>先在后台新增自习室，确保存在有效的 <code>study_room_id</code>。</li>
+            <li>点击“下载 Excel 模板”，按模板中的字段顺序填写。</li>
+            <li>每一行代表 1 个座位，支持不同楼层和不同区域混合导入。</li>
+            <li>回到后台“自习室管理”页上传 Excel 文件，导入成功后会即时写入数据库。</li>
+        </ol>
+    </section>
+
+    <section class="panel">
+        <h2>字段说明</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>字段</th>
+                <th>说明</th>
+                <th>示例</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>study_room_id</code></td>
+                <td>自习室 ID，必须已存在于系统中。</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><code>seat_code</code></td>
+                <td>座位编号，建议按楼层 + 分区 + 序号统一编码。</td>
+                <td>A101 / 3F-C-018</td>
+            </tr>
+            <tr>
+                <td><code>floor_no</code></td>
+                <td>楼层编号，学生端可按楼层切换座位布局。</td>
+                <td>1 / 2 / 3</td>
+            </tr>
+            <tr>
+                <td><code>zone_name</code></td>
+                <td>区域名称，会在学生端用于分区展示。</td>
+                <td>临窗静音区 / 开放学习区</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="grid">
+        <section class="panel">
+            <h2>推荐编码规则</h2>
+            <ul>
+                <li>一楼临窗区：<code>1F-W-001</code> 到 <code>1F-W-060</code></li>
+                <li>二楼安静区：<code>2F-Q-001</code> 到 <code>2F-Q-080</code></li>
+                <li>三楼开放区：<code>3F-O-001</code> 到 <code>3F-O-120</code></li>
+            </ul>
+        </section>
+
+        <section class="panel">
+            <h2>填写注意事项</h2>
+            <ul>
+                <li>不要修改首行表头名称。</li>
+                <li>空白行会自动跳过，但字段为空的非空行会报错。</li>
+                <li>同一自习室建议避免重复的 <code>seat_code</code>。</li>
+                <li>导入前先确认楼层和区域命名与学生端展示一致。</li>
+            </ul>
+        </section>
+    </div>
+</div>
+</body>
+</html>

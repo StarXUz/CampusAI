@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="活动海报">
+  <defs>
+    <linearGradient id="act3" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#17433b"/>
+      <stop offset="100%" stop-color="#3d9d86"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="480" rx="36" fill="url(#act3)"/>
+  <circle cx="620" cy="128" r="78" fill="#ffffff12"/>
+  <circle cx="694" cy="212" r="48" fill="#ffffff1b"/>
+  <circle cx="562" cy="360" r="120" fill="#ffffff10"/>
+  <text x="72" y="168" font-size="60" font-weight="700" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#f3fffb">成长与学习活动</text>
+  <text x="72" y="242" font-size="30" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#d7f5ec">经验交流 · 职业规划 · 夜读分享</text>
+  <rect x="72" y="292" width="272" height="62" rx="31" fill="#f3fffb"/>
+  <text x="208" y="334" text-anchor="middle" font-size="28" font-family="PingFang SC, Microsoft YaHei, sans-serif" fill="#1e6556">立即查看活动</text>
+</svg>
